@@ -30,8 +30,9 @@ url = "jdbc:mysql://wso2is-mysql-db-service:3306/WSO2IS_IDENTITY_DB?autoReconnec
 username = "wso2carbon"
 password = "wso2carbon"
 driver = "com.mysql.cj.jdbc.Driver"
+
 [database.identity_db.pool_options]
-validationQuery="SELECT 1"
+validationQuery = "SELECT 1"
 
 [database.shared_db]
 type = "mysql"
@@ -40,7 +41,7 @@ username = "wso2carbon"
 password = "wso2carbon"
 driver = "com.mysql.cj.jdbc.Driver"
 [database.shared_db.pool_options]
-validationQuery="SELECT 1"
+validationQuery = "SELECT 1"
 
 [keystore.primary]
 file_name = "wso2carbon.jks"
@@ -63,11 +64,12 @@ url = "jdbc:mysql://wso2is-mysql-db-service:3306/WSO2IS_IDENTITY_DB?autoReconnec
 username = "wso2carbon"
 password = "wso2carbon"
 driver = "com.mysql.cj.jdbc.Driver"
-"pool_options.validationQuery"="SELECT 1"
-"pool_options.maxActive"=50
-"pool_options.maxWait" = 60000 # wait in milliseconds
-"pool_options.testOnBorrow" = true
-"pool_options.jmxEnabled" = false
+[datasource.pool_options]
+validationQuery = "SELECT 1"
+maxActive=50
+maxWait = 60000 # wait in milliseconds
+testOnBorrow = true
+jmxEnabled = false
 [authentication.consent]
 data_source="jdbc/WSO2ConsentDS"
 

@@ -1,4 +1,3 @@
 
 # exclude downloaded wars
-**/sample-apps/*
-!**/sample-apps/.gitkeep
+**/node-apps/*

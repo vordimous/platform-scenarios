@@ -5,18 +5,15 @@ services:
   boostrap:
     image: busybox:1.32
     volumes:
-      - ../config-volumes/dropins:/dropins/
-      - ../config-volumes/plugins:/plugins/
+      - ../config-volumes/identity-server/components/dropins:/dropins/
+      - ../config-volumes/identity-server/components/plugins:/plugins/
       - dropins-jars:/dropins-jars
       - plugins-jars:/plugins-jars
-      - ../sample-apps:/sample-apps # these wars need to sync to the file system in order to modify the .properties files
     command:
       - "sh"
       - "-c"
       - |
           wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.17/mysql-connector-java-8.0.17.jar -P /dropins-jars/;
-          wget https://github.com/wso2/samples-is/releases/download/v4.3.0/pickup-dispatch.war -P /sample-apps/;
-          wget https://github.com/wso2/samples-is/releases/download/v4.3.0/pickup-manager.war -P /sample-apps/;
           cp -a /dropins/. /dropins-jars/;
           cp -a /plugins/. /plugins-jars/;
 
@@ -24,7 +21,7 @@ services:
   wso2is-mysql-db-service:
     image: mysql:5.7
     ports:
-      - "3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: wso2carbon
@@ -57,7 +54,7 @@ services:
       - "-c"
       - |
           wget -qO- https://raw.githubusercontent.com/eficode/wait-for/v2.1.0/wait-for | 
-          sh -s -- wso2is-mysql-db-service:3306 --timeout=80 -- $${WORKING_DIRECTORY}/docker-entrypoint.sh
+          sh -s -- wso2is-mysql-db-service:3306 --timeout=80 -- $${WORKING_DIRECTORY}/docker-entrypoint.sh;
     healthcheck:
       test: ["CMD", "curl", "-k", "-v", "https://localhost:9443/api/health-check/v1.0/health"]
       interval: 5s
@@ -72,19 +69,10 @@ services:
       - wso2is-mysql-db-service
       - mailserver
 
-  # Web aplications
-  sample-apps:
-    image: tomcat
-    ports: 
-      - "8080:8080"
-    volumes:
-      - ../sample-apps:/usr/local/tomcat/webapps
-    depends_on:
-      - boostrap
-
 volumes:
   # Downloaded jars
   dropins-jars:
   plugins-jars:
   # Persistant mysql data
   mysql-datavolume:
+    driver: local

@@ -1,0 +1,56 @@
+version: "3"
+services:
+
+  # Startup Worker
+  boostrap:
+    image: busybox:1.32
+    volumes:
+      - ./node-apps:/node-apps
+    command:
+      - "sh"
+      - "-c"
+      - |
+          wget -c https://github.com/asgardeo/asgardeo-auth-spa-sdk/releases/download/v0.1.6/asgardeo-react-js-app.zip;
+          unzip asgardeo-react-js-app.zip -d /node-apps/;
+          wget -c https://github.com/asgardeo/asgardeo-auth-spa-sdk/releases/download/v0.1.6/asgardeo-react-ts-app.zip;
+          unzip asgardeo-react-ts-app.zip -d /node-apps/;
+
+  js-app:
+    image: node:15
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: development
+      PORT: "5000"
+    volumes:
+      - ./node-apps/asgardeo-react-js-app:/home/node/app
+    ports:
+      - "5000:5000"
+    command: 
+      - "sh"
+      - "-c"
+      - |
+          npm i;
+          npm i webpack-dev-server -g;
+          webpack-dev-server --host 0.0.0.0 --mode development --inline --hot;
+    depends_on:
+      - boostrap
+
+  ts-app:
+    image: node:16
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: development
+      PORT: "3000"
+    volumes:
+      - ./node-apps/asgardeo-react-ts-app:/home/node/app
+    ports:
+      - "3000:3000"
+    command: 
+      - "sh"
+      - "-c"
+      - |
+          rm package-lock.json;
+          yarn;
+          yarn start;
+    depends_on:
+      - boostrap
