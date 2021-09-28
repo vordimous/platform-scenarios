@@ -1,0 +1,46 @@
+version: "3"
+services:
+
+  # Cert Creation 
+  certgen:
+    image: openjdk:8
+    user: "root"
+    environment:
+      SERVER_HOST: localhost
+      USER_N_DOMAIN: bob@carbon.super
+      CERT_PASS: browserpwd
+      KEYSTORE_FILENAME: localcert
+      TRUSTSTORE_FILENAME: cacerts
+      STORE_PASS: wso2carbon
+    volumes:
+      - ../configs/security:/security
+    command:
+      - "sh"
+      - "-c"
+      - |
+          cd security;
+          rm -rf *;
+          
+          echo "setup";
+          mkdir -p demoCA/newcerts;
+          touch demoCA/index.txt;
+          echo '01' > demoCA/serial;
+
+          openssl genrsa -out rootCA.key 2048;
+          openssl req -new -x509 -days 365 -key rootCA.key -out rootCA.crt -subj "/CN=$${SERVER_HOST}/O=Wso2 LTD./C=LK";
+          
+          keytool -genkey -v -alias $${KEYSTORE_FILENAME} -keyalg RSA -validity 365 -keystore $${KEYSTORE_FILENAME}.jks -storepass $${STORE_PASS} -keypass $${STORE_PASS} -dname "cn=$${USER_N_DOMAIN}+o=WSO2, c=US";
+          keytool -certreq -alias $${KEYSTORE_FILENAME} -file $${KEYSTORE_FILENAME}.csr -keystore $${KEYSTORE_FILENAME}.jks -storepass $${STORE_PASS};
+
+          echo "make csr";
+          openssl ca -batch -startdate 150813080000Z -enddate 250813090000Z -keyfile rootCA.key -cert rootCA.crt -policy policy_anything -notext -in $${KEYSTORE_FILENAME}.csr -out $${KEYSTORE_FILENAME}.crt;
+
+          keytool -importcert -alias rootCA -file rootCA.crt -keystore $${KEYSTORE_FILENAME}.jks -storepass $${STORE_PASS} -noprompt;
+          keytool -importcert -alias $${KEYSTORE_FILENAME} -file demoCA/newcerts/01.pem -keystore $${KEYSTORE_FILENAME}.jks -storepass $${STORE_PASS} -noprompt;
+
+          echo "gen user cert";
+          keytool -importkeystore -srckeystore $${KEYSTORE_FILENAME}.jks -destkeystore $${SERVER_HOST}.p12 -srcstoretype JKS -deststoretype pkcs12 -srcstorepass $${STORE_PASS} -deststorepass $${CERT_PASS} -srcalias $${KEYSTORE_FILENAME} -destalias browserKey -srckeypass $${STORE_PASS} -destkeypass browserpwd -noprompt;
+
+          echo "sign cert";
+          keytool -import -keystore $${TRUSTSTORE_FILENAME}.jks -storepass $${STORE_PASS} -alias rootCA -file rootCA.crt -noprompt;
+          keytool -importcert -alias $${KEYSTORE_FILENAME} -file $${KEYSTORE_FILENAME}.crt -keystore $${TRUSTSTORE_FILENAME}.jks -storepass $${STORE_PASS} -noprompt;

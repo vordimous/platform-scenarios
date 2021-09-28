@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!--
+  ~ Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~  WSO2 Inc. licenses this file to you under the Apache License,
+  ~  Version 2.0 (the "License"); you may not use this file except
+  ~  in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+-->
+
+<Server port="8005" shutdown="SHUTDOWN" xmlns:svns="http://org.wso2.securevault/configuration">
+
+    <Service className="org.wso2.carbon.tomcat.ext.service.ExtendedStandardService" name="Catalina">
+
+       <!--
+            optional attributes:
+test
+            proxyPort="80"
+       -->
+       {% if transport.http.enabled is sameas true %}
+       <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
+       {% for property_name,property_value in transport.http.properties.items() %}
+                  {{property_name}}="{{property_value}}"
+                          {% endfor %}
+       >
+       </Connector>
+       {% endif %}
+
+       <!--
+            optional attributes:
+test
+            proxyPort="443"
+            Added sslEnabledProtocols="TLSv1,TLSv1.1,TLSv1.2" for poodle vulnerability fix
+       -->
+       {% if transport.https.enabled is sameas true %}
+       <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
+       {% for property_name,property_value in transport.https.properties.items() %}
+                  {{property_name}}="{{property_value}}"
+                  {% endfor %}
+       >
+           <SSLHostConfig
+                   {% for property_name,property_value in transport.https.sslHostConfig.properties.items() %}
+                                      {{property_name}}="{{property_value}}"
+                                      {% endfor %}
+                                      >
+               <Certificate
+               {% for property_name,property_value in transport.https.sslHostConfig.certificate.properties.items() %}
+                                                      {{property_name}}="{{property_value}}"
+                                                      {% endfor %}
+                            />
+           </SSLHostConfig>
+       </Connector>
+       {% endif %}
+
+       {% for trasport in custom_trasport %}
+          <Connector
+          {% for name,value in trasport.properties.items() %}
+                    {{name}}="{{value}}"
+          {% endfor %}
+          >
+          </Connector>
+        {% endfor %}
+
+        <Engine name="Catalina" defaultHost="localhost">
+
+            <!--Realm className="org.apache.catalina.realm.MemoryRealm" pathname="${carbon.home}/repository/conf/tomcat/tomcat-users.xml"/-->
+
+            <Realm className="org.wso2.carbon.tomcat.ext.realms.CarbonTomcatRealm"/>
+
+            <Host name="localhost" unpackWARs="true" deployOnStartup="false" autoDeploy="false"
+                  appBase="${carbon.home}/repository/deployment/server/webapps/">
+                <Valve className="org.wso2.carbon.tomcat.ext.valves.RequestCorrelationIdValve"
+                       headerToCorrelationIdMapping="{{log_correlation.header_config}}"
+                       queryToCorrelationIdMapping="{'RelayState':'Correlation-ID'}"/>
+                <Valve className="org.wso2.carbon.tomcat.ext.valves.RequestEncodingValve" encoding="UTF-8"/>
+                <Valve className="org.wso2.carbon.tomcat.ext.valves.CarbonContextCreatorValve"/>
+                {% if http_access_log.useLogger is sameas true %}
+                <Valve className="org.wso2.carbon.tomcat.ext.valves.ConfigurableLoggerAccessLogValve"
+                                    pattern="{{http_access_log.pattern}}"/>
+                {% else %}
+                <Valve className="org.apache.catalina.valves.AccessLogValve" directory="${carbon.home}/repository/logs"
+                       prefix="http_access_" suffix=".log" pattern="{{http_access_log.pattern}}"/>
+                {% endif %}
+                <Valve className="org.wso2.carbon.tomcat.ext.valves.CarbonStuckThreadDetectionValve" threshold="600"/>
+                <Valve className="org.wso2.carbon.tomcat.ext.valves.CompositeValve"/>
+
+                <!-- Authentication and Authorization valve for the rest apis and we can configure context for this in identity.xml.j2  -->
+                <Valve className="org.wso2.carbon.identity.auth.valve.AuthenticationValve"/>
+                <Valve className="org.wso2.carbon.identity.authz.valve.AuthorizationValve"/>
+                <Valve className="org.wso2.carbon.identity.cors.valve.CORSValve"/>
+                <Valve className="org.wso2.carbon.identity.context.rewrite.valve.TenantContextRewriteValve"/>
+                <!--Error pages -->
+                <Valve className="org.apache.catalina.valves.ErrorReportValve" showServerInfo="false" showReport="false"/>
+                {% for valve in catalina.valves %}
+                <Valve
+                    {% for property,value in valve.properties.items() %}
+                      {{property}}="{{value}}"
+                    {% endfor %}
+                 />
+                {% endfor %}
+            </Host>
+        </Engine>
+    </Service>
+</Server>

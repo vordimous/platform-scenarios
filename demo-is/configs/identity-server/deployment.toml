@@ -76,7 +76,7 @@ data_source="jdbc/WSO2ConsentDS"
 [cors]
 allow_generic_http_requests = true
 allow_any_origin = true
-allowed_origins = ["http://localhost"]
+allowed_origins = ["http://$ref{server.hostname}", "https://$ref{server.hostname}"]
 allow_subdomains = true
 supported_methods = [
     "GET",
@@ -95,6 +95,33 @@ tag_requests = false
 enable= true
 [carbon_health_check.health_checker.data_source_health_checker.properties]
 'monitored.datasources' = "jdbc/WSO2CarbonDB,jdbc/WSO2UM_DB,jdbc/SHARED_DB"
+
+#x509 config
+[custom_trasport.x509.properties]
+protocols="HTTP/1.1"
+port="8443"
+maxThreads="200"
+scheme="https"
+secure=true
+SSLEnabled=true
+keystoreFile="/repository/resources/security/localcert.jks"
+keystorePass="wso2carbon"
+truststoreFile="/repository/resources/security/cacerts.jks"
+truststorePass="wso2carbon"
+bindOnInit=false
+clientAuth="want"
+ssl_protocol = "TLS"
+
+[certificate_validation]
+ocsp_validator_enabled="false"
+crl_validator_enabled="false"
+
+[authentication.authenticator.x509_certificate.parameters]
+name ="x509CertificateAuthenticator"
+enable=true
+AuthenticationEndpoint="https://localhost:8443/x509-certificate-servlet"
+username= "CN"
+UsernameRegex='([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)'
 
 #SMTP email server configurations
 [output_adapter.email]

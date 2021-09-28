@@ -18,3 +18,9 @@ services:
     extends:
       file: node-installs.yml
       service: node16
+
+  # Cert Worker
+  certgen:
+    extends:
+      file: certgen.yml
+      service: certgen

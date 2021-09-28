@@ -34,6 +34,10 @@ The only prerequisite is a working `docker` instance and the `Demo-IS` project d
       docker-compose -f bootstrap/tomcat-wars.yml up && docker-compose -f bootstrap/tomcat-wars.yml down
       ```
 
+      ```shell
+      docker-compose -f bootstrap/certgen.yml up && docker-compose -f bootstrap/certgen.yml down
+      ```
+
 ### Run Identity Server
 
 1. Make any required configuration changes to the [deployment.toml](../configs/identity-server/deployment.toml).
