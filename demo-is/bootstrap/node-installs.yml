@@ -1,0 +1,32 @@
+version: "3"
+services:
+
+  # Node Worker
+  node14:
+    image: node:14
+    volumes:
+      - ../webapps/node:/apps/
+    command:
+      - "sh"
+      - "-c"
+      - |
+          wget -c https://github.com/asgardeo/asgardeo-auth-spa-sdk/releases/download/v0.1.10/asgardeo-react-js-app.zip;
+          unzip -n asgardeo-react-js-app.zip -d /apps/;
+          cd /apps/asgardeo-react-js-app;
+          npm i --no-audit --no-fund;
+
+  # Node Worker
+  node16:
+    image: node:16
+    volumes:
+      - ../webapps/node:/apps/
+    command:
+      - "sh"
+      - "-c"
+      - |
+          wget -c https://github.com/asgardeo/asgardeo-auth-spa-sdk/releases/download/v0.1.10/asgardeo-react-ts-app.zip;
+          unzip -n asgardeo-react-ts-app.zip -d /apps/;
+          # cp -a /apps/. /node-apps/;
+          cd /apps/asgardeo-react-ts-app;
+          rm package-lock.json;
+          yarn;

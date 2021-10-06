@@ -15,8 +15,11 @@ jobs:
           username: ${{ secrets.WSO2_SUB_USER }}
           password: ${{ secrets.WSO2_SUB_PASS }}
       - uses: actions/checkout@v2
+      - name: Download components
+        run: docker-compose -f bootstrap/components.yml up && docker-compose -f bootstrap/components.yml down
+        working-directory: ./demo-is
       - name: Build the stack
         run: docker-compose up -d
-        working-directory: ./demo-is/compose
+        working-directory: ./demo-is
       - name: Test Idenity server started
-        run: docker run --network compose_default appropriate/curl -kv --retry 10 --retry-connrefused https://identity-server:9443/api/health-check/v1.0/health
+        run: docker run --network demo-is_default appropriate/curl -kv --retry 10 --retry-connrefused https://identity-server:9443/api/health-check/v1.0/health

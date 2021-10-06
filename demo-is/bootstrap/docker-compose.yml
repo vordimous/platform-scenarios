@@ -1,0 +1,20 @@
+version: "3"
+services:
+
+  # components Worker
+  components:
+    extends:
+      file: components.yml
+      service: component-jars
+
+  # Node Worker
+  node14:
+    extends:
+      file: node-installs.yml
+      service: node14
+
+  # Node Worker
+  node16:
+    extends:
+      file: node-installs.yml
+      service: node16

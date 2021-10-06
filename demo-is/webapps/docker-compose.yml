@@ -1,0 +1,17 @@
+version: "3"
+services:
+
+  js-app:
+    extends:
+      file: node-apps.yml
+      service: js-app
+
+  ts-app:
+    extends:
+      file: node-apps.yml
+      service: ts-app
+
+  tomcat-apps:
+    extends:
+      file: tomcat-apps.yml
+      service: tomcat-apps

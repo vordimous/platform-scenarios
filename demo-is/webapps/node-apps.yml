@@ -1,0 +1,34 @@
+version: "3"
+services:
+
+  js-app:
+    image: node:14
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: development
+      PORT: "5000"
+    volumes:
+      - ./node/asgardeo-react-js-app:/home/node/app:rw
+    ports:
+      - "5000:5000"
+    command: 
+      - "sh"
+      - "-c"
+      - |
+        node_modules/.bin/webpack-dev-server --host 0.0.0.0 --mode development --inline --hot;
+
+  ts-app:
+    image: node:16
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: development
+      HOST: "0.0.0.0"
+      PORT: "3000"
+    volumes:
+      - ./node/asgardeo-react-ts-app:/home/node/app:rw
+    ports:
+      - "3000:3000"
+    command: 
+      - "sh"
+      - "-c"
+      - "yarn start;"

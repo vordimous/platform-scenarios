@@ -1,3 +1,7 @@
 
 # exclude downloaded wars
-**/node-apps/*
+**/webapps/node/*
+**/components/dropins/*
+**/components/plugins/*
+
+!/**/.gitkeep

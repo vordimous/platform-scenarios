@@ -1,0 +1,14 @@
+version: "3"
+services:
+
+  # components Worker
+  component-jars:
+    image: busybox:1.32
+    volumes:
+      - ../components/dropins:/dropins/
+      - ../components/plugins:/plugins/
+    command:
+      - "sh"
+      - "-c"
+      - |
+          wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.17/mysql-connector-java-8.0.17.jar -P /dropins/;
