@@ -32,6 +32,10 @@ services:
   identity-server:
     image: docker.wso2.com/wso2is:5.11.0.0 #5.11.0.0 is the latest 5.11 version alias
     user: "root"
+    networks:
+      default:
+          aliases: 
+              - localhost.com
     ports:
       - "9763:9763"
       - "9443:9443"
@@ -43,6 +47,9 @@ services:
           sh -s -- wso2is-mysql-db-service:3306 --timeout=160 -- echo "db ready";
 
           # Pre-start commands:
+          echo "sign cert";
+          keytool -import -alias localcert -file $${WORKING_DIRECTORY}/wso2-config-volume/repository/resources/security/pkn.pem -keystore $${WSO2_SERVER_HOME}/repository/resources/security/client-truststore.jks -storepass wso2carbon -noprompt;
+
 
           echo "starting IS";
           $${WORKING_DIRECTORY}/docker-entrypoint.sh;
@@ -53,6 +60,7 @@ services:
       start_period: 100s
     volumes:
       - ./configs/identity-server:/home/wso2carbon/wso2-config-volume/repository/conf/
+      - ./configs/security:/home/wso2carbon/wso2-config-volume/repository/resources/security/
       - ./components/dropins:/home/wso2carbon/wso2-artifact-volume/repository/components/dropins/
       - ./components/plugins:/home/wso2carbon/wso2-artifact-volume/repository/components/plugins/
     depends_on:

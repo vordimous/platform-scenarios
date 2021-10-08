@@ -3,5 +3,6 @@
 **/webapps/node/*
 **/components/dropins/*
 **/components/plugins/*
+**/configs/security/*
 
 !/**/.gitkeep

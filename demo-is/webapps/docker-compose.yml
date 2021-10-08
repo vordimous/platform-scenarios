@@ -15,3 +15,8 @@ services:
     extends:
       file: tomcat-apps.yml
       service: tomcat-apps
+
+networks:
+  default:
+    external: true
+    name: demo-is_default

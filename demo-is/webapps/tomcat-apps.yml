@@ -1,0 +1,17 @@
+version: "3"
+services:
+
+  tomcat-apps:
+    image: tomcat:9-jdk8
+    ports: 
+      - "8080:8080"
+    volumes:
+      - ./wars:/usr/local/tomcat/webapps
+    entrypoint:
+      - "sh"
+      - "-c"
+      - |
+          # echo "$$(getent hosts host.docker.internal | awk '{ print $$1 }') localhost.com" >> /etc/hosts;
+          /usr/local/tomcat/bin/catalina.sh run && tail -f logs/catalina.*.log;
+
+
