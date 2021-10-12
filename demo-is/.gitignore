@@ -5,3 +5,6 @@
 **/components/plugins/*
 
 !/**/.gitkeep
+
+# include
+!**/org.wso2.carbon.identity.application.authenticator.magiclink-1.0.0.jar

@@ -43,6 +43,10 @@ services:
           sh -s -- wso2is-mysql-db-service:3306 --timeout=160 -- echo "db ready";
 
           # Pre-start commands:
+          cp -f $${WORKING_DIRECTORY}/wso2-config-volume/repository/conf/custom/basicauth.jsp $${WSO2_SERVER_HOME}/repository/deployment/server/webapps/authenticationendpoint/basicauth.jsp;
+          cp -f $${WORKING_DIRECTORY}/wso2-config-volume/repository/conf/custom/application-authentication.xml.j2 $${WSO2_SERVER_HOME}/repository/resources/conf/templates/repository/conf/identity/application-authentication.xml.j2;
+          cp -f $${WORKING_DIRECTORY}/wso2-config-volume/repository/conf/custom/tmp_web.xml $${WSO2_SERVER_HOME}/repository/deployment/server/webapps/authenticationendpoint/WEB-INF/web.xml;
+          cp -f $${WORKING_DIRECTORY}/wso2-config-volume/repository/conf/custom/MagicLinkNotification.jsp $${WSO2_SERVER_HOME}/repository/deployment/server/webapps/authenticationendpoint/MagicLinkNotification.jsp;
 
           echo "starting IS";
           $${WORKING_DIRECTORY}/docker-entrypoint.sh;
