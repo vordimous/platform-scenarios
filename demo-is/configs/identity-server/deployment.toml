@@ -11,18 +11,11 @@ password = "admin"
 create_admin_account = true
 
 [user_store]
-type = "database_unique_id"
-
-[database.user]
-type = "mysql"
-url = "jdbc:mysql://wso2is-mysql-db-service:3306/WSO2IS_SHARED_DB?autoReconnect=true&amp;useSSL=false"
-username = "wso2carbon"
-password = "wso2carbon"
-driver = "com.mysql.cj.jdbc.Driver"
-[database.user.pool_options]
-validationQuery = "SELECT 1"
-[realm_manager]
-data_source = "WSO2USER_DB"
+type = "read_write_ldap_unique_id"
+connection_url = "ldap://localhost:${Ports.EmbeddedLDAP.LDAPServerPort}"
+connection_name = "uid=admin,ou=system"
+connection_password = "admin"
+base_dn = "dc=wso2,dc=org"
 
 [database.identity_db]
 type = "mysql"
@@ -106,36 +99,6 @@ port= 1025
 enable_start_tls= true
 enable_authentication= true
 
-[recaptcha]
-enabled = "true"
-api_url = "https://www.google.com/recaptcha/api.js"
-verify_url = "https://www.google.com/recaptcha/api/siteverify"
-site_key="6LfoXQEVAAA"
-secret_key="6LfoXQEVAAA"
-
-#Enable access for sample
-[[resource.access_control]]
-context = "(.*)/sample-auth/(.*)"
-secure = false
-http_method = "all"
-
-#Enable Email OTP config
-[authentication.authenticator.email_otp]
-name ="EmailOTP"
-enable=true
-[authentication.authenticator.email_otp.parameters]
-EMAILOTPAuthenticationEndpointURL = "https://localhost:9443/emailotpauthenticationendpoint/emailotp.jsp"
-EmailOTPAuthenticationEndpointErrorPage = "https://localhost:9443/emailotpauthenticationendpoint/emailotpError.jsp"
-EmailAddressRequestPage = "https://localhost:9443/emailotpauthenticationendpoint/emailAddress.jsp"
-usecase = "local"
-secondaryUserstore = "primary"
-EMAILOTPMandatory = false
-sendOTPToFederatedEmailAttribute = false
-federatedEmailAttributeKey = "email"
-EmailOTPEnableByUserClaim = true
-CaptureAndUpdateEmailAddress = true
-showEmailAddressInUI = true
-useEventHandlerBasedEmailSender = true
 
 #Enable self registration
 [event.default_listener.identity_mgt]
@@ -151,6 +114,16 @@ enable = true
 enable_email_verification = true 
 lock_on_creation=true
 
-#Enable access for sample apps
-[admin_service.wsdl]
-enable = true
+[authentication.pii_controller]
+name = "Kim"
+contact = "Kim"
+email = "kim@abc.com"
+phone = "01433444333"
+on_behalf = "false"
+url = "https://sample.piicontroller.url"
+country ="USA"
+locality = "Mountain View"
+region = "CA"
+po_box  = "233"
+postal_code  = "94043"
+street_address = "1600"
